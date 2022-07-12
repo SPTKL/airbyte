@@ -15,16 +15,22 @@ export interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ children, title, onClose, clear, closeOnBackground }) => {
   const handleUserKeyPress = useCallback((event, closeModal) => {
     const { keyCode } = event;
+    // Escape key
     if (keyCode === 27) {
       closeModal();
     }
   }, []);
 
   useEffect(() => {
-    onClose && window.addEventListener("keydown", (event) => handleUserKeyPress(event, onClose));
+    if (!onClose) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => handleUserKeyPress(event, onClose);
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      onClose && window.removeEventListener("keydown", (event) => handleUserKeyPress(event, onClose));
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [handleUserKeyPress, onClose]);
 
